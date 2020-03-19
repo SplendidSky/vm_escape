@@ -1,86 +1,87 @@
-typedef struct RTL8139State {
-    /*< private >*/
-    PCIDevice parent_obj;
-    /*< public >*/
+enum ClearBitMasks {
+    MultiIntrClear = 0xF000,
+    ChipCmdClear = 0xE2,
+    Config1Clear = (1<<7)|(1<<6)|(1<<3)|(1<<2)|(1<<1),
+};
 
-    uint8_t phys[8]; /* mac address */
-    uint8_t mult[8]; /* multicast mask array */
+enum ChipCmdBits {
+    CmdReset = 0x10,
+    CmdRxEnb = 0x08,
+    CmdTxEnb = 0x04,
+    RxBufEmpty = 0x01,
+};
 
-    uint32_t TxStatus[4]; /* TxStatus0 in C mode*/ /* also DTCCR[0] and DTCCR[1] in C+ mode */
-    uint32_t TxAddr[4];   /* TxAddr0 */
-    uint32_t RxBuf;       /* Receive buffer */
-    uint32_t RxBufferSize;/* internal variable, receive ring buffer size in C mode */
-    uint32_t RxBufPtr;
-    uint32_t RxBufAddr;
+/* C+ mode */
+enum CplusCmdBits {
+    CPlusRxVLAN   = 0x0040, /* enable receive VLAN detagging */
+    CPlusRxChkSum = 0x0020, /* enable receive checksum offloading */
+    CPlusRxEnb    = 0x0002,
+    CPlusTxEnb    = 0x0001,
+};
 
-    uint16_t IntrStatus;
-    uint16_t IntrMask;
+/* Interrupt register bits, using my own meaningful names. */
+enum IntrStatusBits {
+    PCIErr = 0x8000,
+    PCSTimeout = 0x4000,
+    RxFIFOOver = 0x40,
+    RxUnderrun = 0x20, /* Packet Underrun / Link Change */
+    RxOverflow = 0x10,
+    TxErr = 0x08,
+    TxOK = 0x04,
+    RxErr = 0x02,
+    RxOK = 0x01,
 
-    uint32_t TxConfig;
-    uint32_t RxConfig;
-    uint32_t RxMissed;
+    RxAckBits = RxFIFOOver | RxOverflow | RxOK,
+};
 
-    uint16_t CSCR;
+enum TxStatusBits {
+    TxHostOwns = 0x2000,
+    TxUnderrun = 0x4000,
+    TxStatOK = 0x8000,
+    TxOutOfWindow = 0x20000000,
+    TxAborted = 0x40000000,
+    TxCarrierLost = 0x80000000,
+};
+enum RxStatusBits {
+    RxMulticast = 0x8000,
+    RxPhysical = 0x4000,
+    RxBroadcast = 0x2000,
+    RxBadSymbol = 0x0020,
+    RxRunt = 0x0010,
+    RxTooLong = 0x0008,
+    RxCRCErr = 0x0004,
+    RxBadAlign = 0x0002,
+    RxStatusOK = 0x0001,
+};
 
-    uint8_t  Cfg9346;
-    uint8_t  Config0;
-    uint8_t  Config1;
-    uint8_t  Config3;
-    uint8_t  Config4;
-    uint8_t  Config5;
+/* Bits in RxConfig. */
+enum rx_mode_bits {
+    AcceptErr = 0x20,
+    AcceptRunt = 0x10,
+    AcceptBroadcast = 0x08,
+    AcceptMulticast = 0x04,
+    AcceptMyPhys = 0x02,
+    AcceptAllPhys = 0x01,
+};
 
-    uint8_t  clock_enabled;
-    uint8_t  bChipCmdState;
+/* Bits in TxConfig. */
+enum tx_config_bits {
 
-    uint16_t MultiIntr;
+        /* Interframe Gap Time. Only TxIFG96 doesn't violate IEEE 802.3 */
+        TxIFGShift = 24,
+        TxIFG84 = (0 << TxIFGShift),    /* 8.4us / 840ns (10 / 100Mbps) */
+        TxIFG88 = (1 << TxIFGShift),    /* 8.8us / 880ns (10 / 100Mbps) */
+        TxIFG92 = (2 << TxIFGShift),    /* 9.2us / 920ns (10 / 100Mbps) */
+        TxIFG96 = (3 << TxIFGShift),    /* 9.6us / 960ns (10 / 100Mbps) */
 
-    uint16_t BasicModeCtrl;
-    uint16_t BasicModeStatus;
-    uint16_t NWayAdvert;
-    uint16_t NWayLPAR;
-    uint16_t NWayExpansion;
+    TxLoopBack = (1 << 18) | (1 << 17), /* enable loopback test mode */
+    TxCRC = (1 << 16),    /* DISABLE appending CRC to end of Tx packets */
+    TxClearAbt = (1 << 0),    /* Clear abort (WO) */
+    TxDMAShift = 8,        /* DMA burst value (0-7) is shifted this many bits */
+    TxRetryShift = 4,    /* TXRR value (0-15) is shifted this many bits */
 
-    uint16_t CpCmd;
-    uint8_t  TxThresh;
-
-    NICState *nic;
-    NICConf conf;
-
-    /* C ring mode */
-    uint32_t   currTxDesc;
-
-    /* C+ mode */
-    uint32_t   cplus_enabled;
-
-    uint32_t   currCPlusRxDesc;
-    uint32_t   currCPlusTxDesc;
-
-    uint32_t   RxRingAddrLO;
-    uint32_t   RxRingAddrHI;
-
-    EEprom9346 eeprom;
-
-    uint32_t   TCTR;
-    uint32_t   TimerInt;
-    int64_t    TCTR_base;
-
-    /* Tally counters */
-    RTL8139TallyCounters tally_counters;
-
-    /* Non-persistent data */
-    uint8_t   *cplus_txbuffer;
-    int        cplus_txbuffer_len;
-    int        cplus_txbuffer_offset;
-
-    /* PCI interrupt timer */
-    QEMUTimer *timer;
-
-    MemoryRegion bar_io;
-    MemoryRegion bar_mem;
-
-    /* Support migration to/from old versions */
-    int rtl8139_mmio_io_addr_dummy;
-} RTL8139State;
+    TxVersionMask = 0x7C800000, /* mask out version bits 30-26, 23 */
+};
 
 
 /* Symbolic offsets to registers. */
