@@ -1,3 +1,45 @@
+/* w0 ownership flag */
+#define CP_TX_OWN (1<<31)
+/* w0 end of ring flag */
+#define CP_TX_EOR (1<<30)
+/* first segment of received packet flag */
+#define CP_TX_FS (1<<29)
+/* last segment of received packet flag */
+#define CP_TX_LS (1<<28)
+/* large send packet flag */
+#define CP_TX_LGSEN (1<<27)
+/* large send MSS mask, bits 16...25 */
+#define CP_TC_LGSEN_MSS_MASK ((1 << 12) - 1)
+
+/* IP checksum offload flag */
+#define CP_TX_IPCS (1<<18)
+/* UDP checksum offload flag */
+#define CP_TX_UDPCS (1<<17)
+/* TCP checksum offload flag */
+#define CP_TX_TCPCS (1<<16)
+
+/* w0 bits 0...15 : buffer size */
+#define CP_TX_BUFFER_SIZE (1<<16)
+#define CP_TX_BUFFER_SIZE_MASK (CP_TX_BUFFER_SIZE - 1)
+/* w1 add tag flag */
+#define CP_TX_TAGC (1<<17)
+/* w1 bits 0...15 : VLAN tag (big endian) */
+#define CP_TX_VLAN_TAG_MASK ((1<<16) - 1)
+/* w2 low  32bit of Rx buffer ptr */
+/* w3 high 32bit of Rx buffer ptr */
+
+/* set after transmission */
+/* FIFO underrun flag */
+#define CP_TX_STATUS_UNF (1<<25)
+/* transmit error summary flag, valid if set any of three below */
+#define CP_TX_STATUS_TES (1<<23)
+/* out-of-window collision flag */
+#define CP_TX_STATUS_OWC (1<<22)
+/* link failure flag */
+#define CP_TX_STATUS_LNKF (1<<21)
+/* excessive collisions flag */
+#define CP_TX_STATUS_EXC (1<<20)
+
 enum ClearBitMasks {
     MultiIntrClear = 0xF000,
     ChipCmdClear = 0xE2,
