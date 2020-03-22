@@ -1,3 +1,23 @@
+typedef struct {
+    uint32_t txdw0;
+    uint32_t txdw1;
+    uint32_t txbufLO;
+    uint32_t txbufHI;
+} rtl8139_cplus_tx_ring_desc;
+
+typedef struct {
+    uint32_t rxdw0;
+    uint32_t rxdw1;
+    uint32_t rxbufLO;
+    uint32_t rxbufHI;
+} rtl8139_cplus_rx_ring_desc;
+
+// 16 bytes
+typedef struct {
+    rtl8139_cplus_rx_ring_desc *cplus_rx_ring_desc;
+    void *buf;
+} rtl8139_cplus_rx_ring;
+
 /* w0 ownership flag */
 #define CP_RX_OWN (1<<31)
 /* w0 end of ring flag */
