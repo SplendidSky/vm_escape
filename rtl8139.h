@@ -18,6 +18,9 @@ typedef struct {
     void *buf;
 } rtl8139_cplus_rx_ring;
 
+#define PAGE_SHIFT  12
+#define PAGE_SIZE   (1 << PAGE_SHIFT)
+
 /* w0 ownership flag */
 #define CP_RX_OWN (1<<31)
 /* w0 end of ring flag */
