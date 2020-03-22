@@ -1,4 +1,18 @@
 /* w0 ownership flag */
+#define CP_RX_OWN (1<<31)
+/* w0 end of ring flag */
+#define CP_RX_EOR (1<<30)
+/* w0 bits 0...12 : buffer size */
+#define CP_RX_BUFFER_SIZE_MASK ((1<<13) - 1)
+/* w1 tag available flag */
+#define CP_RX_TAVA (1<<16)
+/* w1 bits 0...15 : VLAN tag */
+#define CP_RX_VLAN_TAG_MASK ((1<<16) - 1)
+
+#define CP_RX_BUFFER_SIZE 1514 + 4
+#define CP_RX_BUFFER_N ((65535 / CP_RX_BUFFER_SIZE) + 1)
+
+/* w0 ownership flag */
 #define CP_TX_OWN (1<<31)
 /* w0 end of ring flag */
 #define CP_TX_EOR (1<<30)
