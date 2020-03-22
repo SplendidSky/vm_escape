@@ -32,7 +32,7 @@ typedef struct {
 #define CP_RX_VLAN_TAG_MASK ((1<<16) - 1)
 
 #define CP_RX_BUFFER_SIZE 1514 + 4
-#define CP_RX_BUFFER_N (65535 / CP_RX_BUFFER_SIZE)
+#define CP_RX_BUFFER_N 44
 
 /* w0 ownership flag */
 #define CP_TX_OWN (1<<31)
