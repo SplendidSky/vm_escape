@@ -12,7 +12,6 @@ typedef struct {
     uint32_t rxbufHI;
 } rtl8139_cplus_rx_ring_desc;
 
-// 16 bytes
 typedef struct {
     rtl8139_cplus_rx_ring_desc *cplus_rx_ring_desc;
     void *buf;
