@@ -158,7 +158,7 @@ void rtl8139_cplus_transmit() {
 }
 
 void enable_transmitter_tx_rx() {
-    rtl8139_writeb(ChipCmd, CmdTxEnb | CmdRxEnb);
+    rtl8139_writeb(ChipCmd, CmdTxEnb | CmdRxEnb | CmdReset);
 }
 
 void enable_cp_transmitter_tx_rx() {
@@ -308,7 +308,7 @@ int main() {
     rtl8139_cplus_rx_ring *rx_ring = set_and_get_rxring();
     rtl8139_cplus_transmit();
 
-    sleep(5);
+    sleep(2);
 
     FILE *fp = fopen("binary","w");
     for (int i = 0; i <= CP_RX_BUFFER_N; i++) {
